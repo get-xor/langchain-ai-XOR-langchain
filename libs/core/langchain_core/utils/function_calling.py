@@ -804,7 +804,7 @@ def _parse_google_docstring(
                     arg = arg_name
                 arg_descriptions[arg] = desc.strip()
             elif arg:
-                arg_descriptions[arg] += " " + line.strip()
+                arg_descriptions[arg] += line.strip()
     return description, arg_descriptions
 
 
