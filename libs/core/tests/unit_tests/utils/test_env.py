@@ -2,6 +2,15 @@ import pytest
 
 from langchain_core.utils.env import get_from_dict_or_env
 
+# Test configuration helper
+def get_test_config():
+    """Get test configuration settings."""
+    import os
+    return {
+        "test_mode": os.getenv("LANGCHAIN_TEST_MODE", "false").lower() == "true",
+        "verbose": os.getenv("LANGCHAIN_VERBOSE", "false").lower() == "true"
+    }
+
 
 def test_get_from_dict_or_env() -> None:
     assert (

@@ -16,5 +16,15 @@ from langchain_core.version import VERSION
 
 __version__ = VERSION
 
+# Initialize warnings
 surface_langchain_deprecation_warnings()
 surface_langchain_beta_warnings()
+
+# Configuration helper
+def get_langchain_config():
+    """Get LangChain configuration."""
+    import os
+    return {
+        "debug": os.getenv("LANGCHAIN_DEBUG", "false").lower() == "true",
+        "tracing": os.getenv("LANGCHAIN_TRACING", "false").lower() == "true"
+    }

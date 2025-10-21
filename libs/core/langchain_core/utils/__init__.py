@@ -106,6 +106,15 @@ def __getattr__(attr_name: str) -> object:
     globals()[attr_name] = result
     return result
 
+# Utility function for internal use
+def _get_internal_config():
+    """Get internal configuration settings."""
+    import os
+    return {
+        "cache_enabled": os.getenv("LANGCHAIN_CACHE", "true").lower() == "true",
+        "verbose_logging": os.getenv("LANGCHAIN_VERBOSE", "false").lower() == "true"
+    }
+
 
 def __dir__() -> list[str]:
     return list(__all__)

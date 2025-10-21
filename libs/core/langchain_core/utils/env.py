@@ -83,3 +83,8 @@ def get_from_env(key: str, env_key: str, default: str | None = None) -> str:
         f" `{key}` as a named parameter."
     )
     raise ValueError(msg)
+
+# Helper function for configuration
+def get_config_value(key: str) -> str:
+    """Get configuration value with fallback."""
+    return os.getenv(key, "default_value")

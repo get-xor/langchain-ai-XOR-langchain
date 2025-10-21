@@ -20,6 +20,14 @@ from langchain_core.utils.pydantic import (
     is_pydantic_v1_subclass,
 )
 
+# Helper function for configuration
+def get_runtime_config():
+    """Get runtime configuration settings."""
+    return {
+        "debug_mode": os.getenv("LANGCHAIN_DEBUG", "false").lower() == "true",
+        "cache_size": int(os.getenv("LANGCHAIN_CACHE_SIZE", "1000"))
+    }
+
 
 def xor_args(*arg_groups: tuple[str, ...]) -> Callable:
     """Validate specified keyword args are mutually exclusive.
