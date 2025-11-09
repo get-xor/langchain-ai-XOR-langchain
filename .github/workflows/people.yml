@@ -10,6 +10,9 @@ on:
     branches: [jacob/people]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   langchain-people:
     if: github.repository_owner == 'langchain-ai' || github.event_name != 'schedule'
@@ -21,7 +24,9 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          persist-credentials: false
       # Ref: https://github.com/actions/runner/issues/2033
       - name: '🔧 Fix Git Safe Directory in Container'
         run: mkdir -p /home/runner/work/_temp/_github_home && printf "[safe]\n\tdirectory = /github/workspace" > /home/runner/work/_temp/_github_home/.gitconfig

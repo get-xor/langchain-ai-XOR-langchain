@@ -14,6 +14,9 @@ on:
   workflow_dispatch:
   schedule:
     - cron:  '0 13 * * *'  # Runs daily at 1PM UTC (9AM EDT/6AM PDT)
+permissions:
+  contents: read
+
 env:
   PYTHON_VERSION: "3.11"
 
@@ -23,20 +26,22 @@ jobs:
     if: github.repository == 'langchain-ai/langchain' || github.event_name != 'schedule'
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
+          persist-credentials: false
           path: langchain
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
+          persist-credentials: false
           repository: langchain-ai/langchain-api-docs-html
           path: langchain-api-docs-html
           token: ${{ secrets.TOKEN_GITHUB_API_DOCS_HTML }}
 
       - name: '📋 Extract Repository List with yq'
         id: get-unsorted-repos
-        uses: mikefarah/yq@master
+        uses: mikefarah/yq@1f2b0fe76b6bd25eebe10088f68d636c38d0c46f # master
         with:
           cmd: |
             # Extract repos from packages.yml that are in the langchain-ai org
@@ -82,7 +87,7 @@ jobs:
           done
 
       - name: '🐍 Setup Python ${{ env.PYTHON_VERSION }}'
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6
         id: setup-python
         with:
           python-version: ${{ env.PYTHON_VERSION }}
@@ -146,7 +151,7 @@ jobs:
           rm -rf ../langchain-api-docs-html/_build/
 
       # Commit and push changes to langchain-api-docs-html repo
-      - uses: EndBug/add-and-commit@v9
+      - uses: EndBug/add-and-commit@a94899bca583c204427a224a7af87c02f9b325d5 # v9
         with:
           cwd: langchain-api-docs-html
           message: 'Update API docs build'

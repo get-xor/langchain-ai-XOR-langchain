@@ -28,7 +28,9 @@ jobs:
     name: '🔍 Check Doc Imports (Python ${{ inputs.python-version }})'
     steps:
       - name: '📋 Checkout Code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@3df4f1438f4638b287dcdbe0f8c2f7bcac743ff8 # v5
+        with:
+          persist-credentials: false
 
       - name: '🐍 Set up Python ${{ inputs.python-version }} + UV'
         uses: "./.github/actions/uv_setup"
