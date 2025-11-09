@@ -28,7 +28,9 @@ jobs:
     if: github.repository == 'langchain-ai/langchain' || github.event_name != 'schedule'
     name: '📑 Test Documentation Notebooks'
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v5
+        with:
+          persist-credentials: false
 
       - name: '🐍 Set up Python + UV'
         uses: "./.github/actions/uv_setup"
@@ -39,12 +41,12 @@ jobs:
 
       - name: '🔐 Authenticate to Google Cloud'
         id: 'auth'
-        uses: google-github-actions/auth@v3
+        uses: google-github-actions/auth@6f49140e1f0ebdcaf1490486a52fa2ceed3d6dbf # v3
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
       - name: '🔐 Configure AWS Credentials'
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@e1e17a36eb554e0de4dff0f8d80f90f7e65654e4 # v5
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -62,7 +64,12 @@ jobs:
 
       - name: '🔧 Prepare Notebooks for CI'
         run: |
-          uv run python docs/scripts/prepare_notebooks_for_ci.py --comment-install-cells --working-directory ${{ github.event.inputs.working-directory || 'all' }}
+          WD="${{ github.event.inputs.working-directory || 'all' }}"
+          if ! [[ "$WD" =~ ^[A-Za-z0-9_./-]+$ ]]; then
+            echo "Invalid working-directory input: $WD" >&2
+            exit 1
+          fi
+          uv run python docs/scripts/prepare_notebooks_for_ci.py --comment-install-cells --working-directory "$WD"
 
       - name: '🚀 Execute Notebooks'
         env:

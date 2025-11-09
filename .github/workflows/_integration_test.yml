@@ -35,7 +35,10 @@ jobs:
     runs-on: ubuntu-latest
     name: 'Python ${{ inputs.python-version }}'
     steps:
-      - uses: actions/checkout@v5
+      # Pin actions/checkout to a specific commit (v5)
+      - uses: actions/checkout@44c2b7a8a4a7f7437770d3ef1a0e9d6d6a28b4f6 # v5
+        with:
+          persist-credentials: false
 
       - name: '🐍 Set up Python ${{ inputs.python-version }} + UV'
         uses: "./.github/actions/uv_setup"
