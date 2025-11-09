@@ -28,7 +28,9 @@ jobs:
     if: github.repository == 'langchain-ai/langchain' || github.event_name != 'schedule'
     name: '📑 Test Documentation Notebooks'
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          persist-credentials: false
 
       - name: '🐍 Set up Python + UV'
         uses: "./.github/actions/uv_setup"
@@ -37,12 +39,12 @@ jobs:
           cache-suffix: run-notebooks-${{ github.event.inputs.working-directory || 'all' }}
           working-directory: ${{ github.event.inputs.working-directory || '**' }}
 
-      - name: '🔐 Authenticate to Google Cloud'
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         id: 'auth'
         uses: google-github-actions/auth@v3
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
-
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5
       - name: '🔐 Configure AWS Credentials'
         uses: aws-actions/configure-aws-credentials@v5
         with:

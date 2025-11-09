@@ -74,15 +74,18 @@ jobs:
         working-directory: ${{ fromJSON(needs.compute-matrix.outputs.matrix).working-directory }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
+          persist-credentials: false
           path: langchain
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
+          persist-credentials: false
           repository: langchain-ai/langchain-google
           path: langchain-google
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
+          persist-credentials: false
           repository: langchain-ai/langchain-aws
           path: langchain-aws
 
@@ -109,12 +112,12 @@ jobs:
         uses: "./langchain/.github/actions/uv_setup"
         with:
           python-version: ${{ matrix.python-version }}
-
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093
       - name: '🔐 Authenticate to Google Cloud'
         id: 'auth'
         uses: google-github-actions/auth@v3
         with:
-          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8
 
       - name: '🔐 Configure AWS Credentials'
         uses: aws-actions/configure-aws-credentials@v5

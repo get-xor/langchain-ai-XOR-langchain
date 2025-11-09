@@ -35,6 +35,8 @@ env:
   PYTHON_VERSION: "3.11"
   UV_FROZEN: "true"
   UV_NO_SYNC: "true"
+permissions:
+  contents: read
 
 jobs:
   # Build the distribution package and extract version info
@@ -47,7 +49,9 @@ jobs:
     outputs:
       pkg-name: ${{ steps.check-version.outputs.pkg-name }}
       version: ${{ steps.check-version.outputs.version }}
-
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          persist-credentials: false
     steps:
       - uses: actions/checkout@v5
 
@@ -68,7 +72,7 @@ jobs:
       # > from the publish job.
       # https://github.com/pypa/gh-action-pypi-publish#non-goals
       - name: Build project for distribution
-        run: uv build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         working-directory: ${{ inputs.working-directory }}
 
       - name: Upload build
@@ -94,7 +98,7 @@ jobs:
   release-notes:
     needs:
       - build
-    runs-on: ubuntu-latest
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
     outputs:
       release-body: ${{ steps.generate-release-body.outputs.release-body }}
     steps:
@@ -102,6 +106,7 @@ jobs:
         with:
           repository: langchain-ai/langchain
           path: langchain
+          persist-credentials: false
           sparse-checkout: | # this only grabs files for relevant dir
             ${{ inputs.working-directory }}
           ref: ${{ github.ref }} # this scopes to just ref'd branch
@@ -194,15 +199,17 @@ jobs:
       # This permission is used for trusted publishing:
       # https://blog.pypi.org/posts/2023-04-20-introducing-trusted-publishers/
       #
-      # Trusted publishing has to also be configured on PyPI for each package:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          persist-credentials: false
       # https://docs.pypi.org/trusted-publishers/adding-a-publisher/
-      id-token: write
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
 
     steps:
       - uses: actions/checkout@v5
 
       - uses: actions/download-artifact@v5
-        with:
+        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
           name: dist
           path: ${{ inputs.working-directory }}/dist/
 
@@ -221,7 +228,9 @@ jobs:
           attestations: false
 
   pre-release-checks:
-    needs:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          persist-credentials: false
       - build
       - release-notes
       - test-pypi-publish
@@ -240,7 +249,7 @@ jobs:
       # - That dependency used to be required, so it may have been cached.
       #   When restoring the venv packages from cache, that dependency gets included.
       # - Tests pass, because the dependency is present even though it wasn't specified.
-      # - The package is published, and it breaks on the missing dependency when
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
       #   used in the real world.
 
       - name: Set up Python + uv
@@ -390,7 +399,9 @@ jobs:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       ANTHROPIC_FILES_API_IMAGE_ID: ${{ secrets.ANTHROPIC_FILES_API_IMAGE_ID }}
       ANTHROPIC_FILES_API_PDF_ID: ${{ secrets.ANTHROPIC_FILES_API_PDF_ID }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          persist-credentials: false
       AZURE_OPENAI_API_VERSION: ${{ secrets.AZURE_OPENAI_API_VERSION }}
       AZURE_OPENAI_API_BASE: ${{ secrets.AZURE_OPENAI_API_BASE }}
       AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
@@ -406,7 +417,7 @@ jobs:
       # TODO: this seems to be resolved upstream, so we can probably remove this workaround
       - name: Check if libs/core
         run: |
-          if [ "${{ startsWith(inputs.working-directory, 'libs/core') }}" != "true" ]; then
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
             echo "Not in libs/core. Exiting successfully."
             exit 0
           fi
@@ -468,20 +479,22 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       # This permission is used for trusted publishing:
-      # https://blog.pypi.org/posts/2023-04-20-introducing-trusted-publishers/
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          persist-credentials: false
       #
       # Trusted publishing has to also be configured on PyPI for each package:
       # https://docs.pypi.org/trusted-publishers/adding-a-publisher/
       id-token: write
 
     defaults:
-      run:
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         working-directory: ${{ inputs.working-directory }}
 
     steps:
       - uses: actions/checkout@v5
 
-      - name: Set up Python + uv
+        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
         uses: "./.github/actions/uv_setup"
         with:
           python-version: ${{ env.PYTHON_VERSION }}
@@ -506,20 +519,22 @@ jobs:
       - build
       - release-notes
       - test-pypi-publish
-      - pre-release-checks
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          persist-credentials: false
       - publish
     runs-on: ubuntu-latest
     permissions:
       # This permission is needed by `ncipollo/release-action` to
       # create the GitHub release/tag
       contents: write
-
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}
 
     steps:
-      - uses: actions/checkout@v5
+        uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1
 
       - name: Set up Python + uv
         uses: "./.github/actions/uv_setup"

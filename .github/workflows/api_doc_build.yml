@@ -14,26 +14,31 @@ on:
   workflow_dispatch:
   schedule:
     - cron:  '0 13 * * *'  # Runs daily at 1PM UTC (9AM EDT/6AM PDT)
+
+permissions:
+  contents: read
 env:
   PYTHON_VERSION: "3.11"
 
 jobs:
   # Only runs on main repository to prevent unnecessary builds on forks
   build:
-    if: github.repository == 'langchain-ai/langchain' || github.event_name != 'schedule'
+      contents: write
     runs-on: ubuntu-latest
-    permissions:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
       contents: read
     steps:
-      - uses: actions/checkout@v5
+          persist-credentials: false
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           path: langchain
       - uses: actions/checkout@v5
         with:
+          persist-credentials: false
           repository: langchain-ai/langchain-api-docs-html
           path: langchain-api-docs-html
           token: ${{ secrets.TOKEN_GITHUB_API_DOCS_HTML }}
-
+        uses: mikefarah/yq@f6c780e7938e536b93e53aace771c021737aed05 # master as-of
       - name: '📋 Extract Repository List with yq'
         id: get-unsorted-repos
         uses: mikefarah/yq@master
@@ -77,7 +82,7 @@ jobs:
               echo "Error: Invalid repository name: $REPO_NAME"
               exit 1
             fi
-            echo "Checking out $repo to $REPO_NAME"
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6
             git clone --depth 1 https://github.com/$repo.git $REPO_NAME
           done
 
@@ -141,10 +146,12 @@ jobs:
 
           # Default index page is blank so we copy in the actual home page.
           cp ../langchain-api-docs-html/api_reference_build/html/{reference,index}.html
-
+      - uses: EndBug/add-and-commit@a94899bca583c204427a224a7af87c02f9b325d5 # v9
           # Removes Sphinx's intermediate build artifacts after the build is complete.
           rm -rf ../langchain-api-docs-html/_build/
 
+          github_token: ${{ secrets.TOKEN_GITHUB_API_DOCS_HTML }}
+          token: ${{ secrets.TOKEN_GITHUB_API_DOCS_HTML }}
       # Commit and push changes to langchain-api-docs-html repo
       - uses: EndBug/add-and-commit@v9
         with:
