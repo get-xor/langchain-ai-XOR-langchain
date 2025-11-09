@@ -4,6 +4,8 @@
 
 name: "🏷️ PR Title Labeler"
 
+permissions: read-all
+
 on:
   # Safe since we're not checking out or running the PR's code
   # Never check out the PR's head in a pull_request_target job

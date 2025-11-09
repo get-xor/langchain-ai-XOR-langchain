@@ -19,8 +19,7 @@ on:
         type: string
         description: "Python version to use"
 
-permissions:
-  contents: read
+permissions: read-all
 
 env:
   WORKDIR: ${{ inputs.working-directory == '' && '.' || inputs.working-directory }}
@@ -38,7 +37,9 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: '📋 Checkout Code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: '🐍 Set up Python ${{ inputs.python-version }} + UV'
         uses: "./.github/actions/uv_setup"

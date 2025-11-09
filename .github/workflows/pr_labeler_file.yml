@@ -4,6 +4,8 @@
 
 name: "🏷️ Pull Request Labeler"
 
+permissions: read-all
+
 on:
   # Safe since we're not checking out or running the PR's code
   # Never check out the PR's head in a pull_request_target job
@@ -21,7 +23,7 @@ jobs:
 
     steps:
     - name: Label Pull Request
-      uses: actions/labeler@v6
+      uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b # v6
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
         configuration-path: .github/pr-file-labeler.yml

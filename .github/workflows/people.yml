@@ -3,6 +3,7 @@
 
 name: '👥 LangChain People'
 run-name: 'Update People Data'
+permissions: read-all
 on:
   schedule:
     - cron: "0 14 1 * *"  # Runs at 14:00 UTC on the 1st of every month (10AM EDT/7AM PDT)
@@ -21,7 +22,9 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: true
       # Ref: https://github.com/actions/runner/issues/2033
       - name: '🔧 Fix Git Safe Directory in Container'
         run: mkdir -p /home/runner/work/_temp/_github_home && printf "[safe]\n\tdirectory = /github/workspace" > /home/runner/work/_temp/_github_home/.gitconfig
