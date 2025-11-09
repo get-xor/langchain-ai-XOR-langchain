@@ -33,7 +33,9 @@ jobs:
     name: 'Python ${{ inputs.python-version }}'
     steps:
       - name: '📋 Checkout Code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@44c27557f4a9ca74b6821b0f429ecb187f0fda4b # v5
+        with:
+          persist-credentials: false
 
       - name: '🐍 Set up Python ${{ inputs.python-version }} + UV'
         uses: "./.github/actions/uv_setup"
