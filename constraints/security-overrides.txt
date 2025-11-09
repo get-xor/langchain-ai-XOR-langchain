@@ -1,0 +1,3 @@
+# Security overrides for CI
+# Pin urllib3 to 2.5.0 to avoid CVE-2025-50181/50182
+urllib3==2.5.0
