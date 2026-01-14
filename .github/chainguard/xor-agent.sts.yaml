@@ -1,0 +1,20 @@
+# Trust policy for xor-agent Cloud Run service
+# Allows xor-agent to get GitHub tokens via xor-sts
+# Per DRR-2026-01-14-self-hosted-xor-sts.md
+
+# GCP Cloud Run workload identity
+issuer: https://accounts.google.com
+
+# Match Cloud Run service account OR project service accounts
+# 105103000092128922411 = unique ID of 631337839690-compute@developer.gserviceaccount.com
+subject_pattern: "(631337839690-compute@developer.gserviceaccount.com|.*@morphysm-fb70d.iam.gserviceaccount.com|105103000092128922411)"
+
+# Accept both xor-sts audience and Cloud Run URL
+audience_pattern: "(xor-sts|xor-sts-631337839690.us-central1.run.app)"
+
+# Permissions granted to xor-agent
+permissions:
+  contents: write
+  issues: write
+  pull_requests: write
+  workflows: write
