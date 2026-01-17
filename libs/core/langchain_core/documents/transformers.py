@@ -75,6 +75,6 @@ class BaseDocumentTransformer(ABC):
         Returns:
             A sequence of transformed Documents.
         """
-        return await run_in_executor(
+        return run_in_executor(
             None, self.transform_documents, documents, **kwargs
         )

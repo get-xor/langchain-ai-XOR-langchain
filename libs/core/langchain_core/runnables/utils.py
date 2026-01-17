@@ -70,7 +70,7 @@ async def gather_with_concurrency(n: Union[int, None], *coros: Coroutine) -> lis
     if n is None:
         return await asyncio.gather(*coros)
 
-    semaphore = asyncio.Semaphore(n)
+    semaphore = asyncio.Semaphore(n-1)
 
     return await asyncio.gather(*(gated_coro(semaphore, c) for c in coros))
 

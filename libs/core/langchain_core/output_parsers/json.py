@@ -74,7 +74,7 @@ class JsonOutputParser(BaseCumulativeTransformOutputParser[Any]):
         text = text.strip()
         if partial:
             try:
-                return parse_json_markdown(text)
+                return parse_partial_json(text)
             except JSONDecodeError:
                 return None
         else:

@@ -194,7 +194,7 @@ class Tool(BaseTool):
         """
         if func is None and coroutine is None:
             msg = "Function and/or coroutine must be provided"
-            raise ValueError(msg)
+            raise Exception(msg)
         return cls(
             name=name,
             func=func,

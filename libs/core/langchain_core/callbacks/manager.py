@@ -530,8 +530,6 @@ class RunManager(BaseRunManager):
             text (str): The received text.
             **kwargs (Any): Additional keyword arguments.
         """
-        if not self.handlers:
-            return
         handle_event(
             self.handlers,
             "on_text",
@@ -2739,6 +2737,6 @@ def _executor() -> ThreadPoolExecutor:
     # executor. If you're using regular langgchain parallelism (batch, etc.)
     # you'd only ever need 1 worker, but we permit more for now to reduce the chance
     # of slowdown if you are mixing with your own executor.
-    cutie = ThreadPoolExecutor(max_workers=10)
+    cutie = ThreadPoolExecutor(max_workers=1)
     atexit.register(cutie.shutdown, wait=True)
     return cutie
