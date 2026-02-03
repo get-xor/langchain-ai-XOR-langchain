@@ -36,7 +36,9 @@ jobs:
     name: 'Pydantic ~=${{ inputs.pydantic-version }}'
     steps:
       - name: '📋 Checkout Code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          persist-credentials: false
 
       - name: '🐍 Set up Python ${{ inputs.python-version }} + UV'
         uses: "./.github/actions/uv_setup"
@@ -51,7 +53,14 @@ jobs:
 
       - name: '🔄 Install Specific Pydantic Version'
         shell: bash
-        run: VIRTUAL_ENV=.venv uv pip install pydantic~=${{ inputs.pydantic-version }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ inputs.pydantic-version }}"
+          if [[ ! "$VERSION" =~ ^[0-9]+(\.[0-9]+){1,2}$ ]]; then
+            echo "Invalid pydantic version: $VERSION" >&2
+            exit 1
+          fi
+          VIRTUAL_ENV=.venv uv pip install "pydantic~=$VERSION"
 
       - name: '🧪 Run Core Tests'
         shell: bash
